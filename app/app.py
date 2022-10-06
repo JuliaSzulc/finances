@@ -11,8 +11,17 @@ f"{len(history_df)} entries"
 f"from {history_df['date'].min().date()} to {history_df['date'].max().date()}"
 
 st.header("Absolute balance")
-"Loans excluded"
+"(loans excluded)"
 
+balance_resolution = st.radio(
+    "Resolution:", ("days", "months"), horizontal=True, label_visibility="collapsed"
+)
 balance_df = helper.get_daily_balance(history_df)
 
-st.altair_chart(chart.create_balance_chart(balance_df), use_container_width=True)
+if balance_resolution == "days":
+    st.altair_chart(chart.create_balance_chart(balance_df), use_container_width=True)
+else:
+    st.altair_chart(
+        chart.create_balance_chart(balance_df[balance_df["date"].dt.day == 1]),
+        use_container_width=True,
+    )
