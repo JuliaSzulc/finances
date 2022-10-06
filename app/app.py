@@ -4,6 +4,8 @@ import streamlit as st
 import chart
 import helper
 
+st.set_page_config(page_title="Personal finances overview", page_icon="📊")
+
 st.title("Personal finances overview")
 
 history_df = helper.load_data()
@@ -25,3 +27,8 @@ else:
         chart.create_balance_chart(balance_df[balance_df["date"].dt.day == 1]),
         use_container_width=True,
     )
+
+st.header("Incomes vs. expenses")
+st.altair_chart(
+    chart.create_expenses_incomes_chart(helper.get_monthly_incomes_expenses(history_df))
+)

@@ -3,7 +3,7 @@ import altair as alt
 import pandas as pd
 
 
-def create_balance_chart(balance_df: pd.DataFrame) -> alt.LayerChart:
+def create_balance_chart(balance_df: pd.DataFrame) -> alt.Chart:
     """
     Creates an interactive chart of absolute balance in time.
 
@@ -48,3 +48,37 @@ def create_balance_chart(balance_df: pd.DataFrame) -> alt.LayerChart:
     )
 
     return (line + tooltips + points).interactive()
+
+
+def create_expenses_incomes_chart(expenses_incomes_df: pd.DataFrame) -> alt.Chart:
+    """
+    Creates a bar chart of monthly aggregated incomes and expenses.
+
+    Args:
+        expenses_incomes_df: DataFrame including `date`, `type` and `amount` columns.
+
+    Returns:
+        Altair chart.
+    """
+    bars = (
+        alt.Chart(expenses_incomes_df)
+        .mark_bar()
+        .encode(
+            x=alt.X("type:N", title="", sort="descending"),
+            y=alt.Y("amount:Q", title="amount [SEK]"),
+            color=alt.Color(
+                "type:N",
+                sort="descending",
+                scale=alt.Scale(range=["mediumseagreen", "indianred"]),
+            ),
+            column="yearmonth(date):T",
+        )
+        .configure_legend(
+            orient="top",
+            title=None,
+        )
+        .configure_header(title=None)
+        .configure_facet(spacing=5)
+    )
+
+    return bars

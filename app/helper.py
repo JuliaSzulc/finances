@@ -7,7 +7,7 @@ with open("data/starting_balance.txt") as fp:
 
 def load_data() -> pd.DataFrame:
     """
-    Load the whole history from `data/history.csv`.
+    Loads the whole history from `data/history.csv`.
 
     Returns:
         Formatted DataFrame ready to use.
@@ -32,12 +32,12 @@ def load_data() -> pd.DataFrame:
 
 def get_daily_balance(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Retrieve balance per day information and add missing dates for all present months.
+    Retrieves balance per day information and add missing dates for all present months.
 
     Note: Loans are excluded from balance calculation.
 
     Args:
-        df: Chronological peration history DataFrame.
+        df: Chronological operation history DataFrame.
 
     Returns:
         Dataframe with date and balance columns.
@@ -67,3 +67,25 @@ def get_daily_balance(df: pd.DataFrame) -> pd.DataFrame:
     balance_df = balance_df.reset_index(names="date")
 
     return balance_df
+
+
+def get_monthly_incomes_expenses(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Groups by month and sums incomes and expenses.
+
+    Args:
+        df: Chronological operation history DataFrame.
+
+    Returns:
+        DataFrame with columns `date`, `type` ("income"/"expense") and `amount`.
+    """
+    incomes_expenses_df = (
+        df.groupby([pd.Grouper(key="date", freq="M"), df["amount"] > 0])["amount"]
+        .sum()
+        .abs()
+        .to_frame()
+        .rename(index={False: "expenses", True: "incomes"})
+        .reset_index(names=["date", "type"])
+    )
+
+    return incomes_expenses_df
